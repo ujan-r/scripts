@@ -26,15 +26,20 @@ suffixed() {
     printf "#endif /* !%s */\n" "$1"
 }
 
-for file
-do
-    mkdir -p "$(dirname "$file")" && touch "$file"
-
+if [ "$#" -eq 0 ]; then
     guard="INCLUDE_GUARD_$(uuidgen | tr '-' '_')"
+    printf "%s\n\n\n\n%s\n" "$(prefixed "$guard")" "$(suffixed "$guard")"
+else
+    for file
+    do
+        mkdir -p "$(dirname "$file")" && touch "$file"
 
-    printf "%s\n\n%s\n\n%s\n"  \
-        "$(prefixed "$guard")" \
-        "$(cat "$file")"       \
-        "$(suffixed "$guard")" \
-    > "$file"
-done
+        guard="INCLUDE_GUARD_$(uuidgen | tr '-' '_')"
+
+        printf "%s\n\n%s\n\n%s\n"  \
+            "$(prefixed "$guard")" \
+            "$(cat "$file")"       \
+            "$(suffixed "$guard")" \
+        > "$file"
+    done
+fi
